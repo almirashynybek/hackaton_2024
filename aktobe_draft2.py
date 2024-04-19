@@ -80,7 +80,7 @@ class TestTube:
 
 def aktobe(screen):
     mouse_x, mouse_y = 0,0 
-    #background_aktobe = pygame.transform.scale(pygame.image.load("images/background_aktobe.jpeg"), (screen.get_width(), screen.get_height()))
+    background_aktobe = pygame.transform.scale(pygame.image.load("images/background_aktobe.png"), (screen.get_width(), screen.get_height()))
     test_tube = pygame.transform.scale(pygame.image.load("images/test_tube.png"), (160, 500))
     settings = pygame.transform.scale(pygame.image.load("images/settings_y.png"), (50, 50))
     settings_rect = settings.get_rect()
@@ -154,8 +154,9 @@ def aktobe(screen):
                 if event.key == pygame.K_SPACE:
                     running = False
                     pygame.quit()
-        #screen.blit(background_aktobe, (0,0))
-        screen.fill("black")
+        
+        screen.blit(background_aktobe, (0,0))
+        
         screen.blit(settings, settings_rect)
         [tubes[i - 1].show(screen, 220*i + 50) for i in range(1, 6)]
 
