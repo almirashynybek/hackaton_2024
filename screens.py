@@ -6,7 +6,7 @@ def menu(menu_flag, screen, button_start_the_game, button_sound, background_soun
     
     color = (0, 0, 0)
     mouse_x, mouse_y = 0, 0
-
+    button_start_the_game = pygame.transform.scale(pygame.image.load(""))
     button_start_the_game_rect = button_start_the_game.get_rect()
     button_start_the_game_rect.center = screen.get_rect().center 
 
