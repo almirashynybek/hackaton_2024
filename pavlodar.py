@@ -1,28 +1,34 @@
 import pygame
 import os
 import random
+import screens
 pygame.init()
 
 info = pygame.display.Info()
 screen_w = info.current_w
 screen_h = info.current_h
 screen = pygame.display.set_mode((screen_w, screen_h))
-RUNNING = [pygame.transform.scale(pygame.image.load("images/run1.png"), (200, 250)),
-           pygame.transform.scale(pygame.image.load("images/run2.png"), (200, 250))]
-JUMPING = [pygame.transform.scale(pygame.image.load("images/person_stand.png"), (200, 250))]
-DUCKING = [pygame.transform.scale(pygame.image.load("images/ducking1.png"), (200, 230)), 
-           pygame.transform.scale(pygame.image.load("images/ducking2.png"), (200, 230))]
-OBSTACLES = [pygame.transform.scale(pygame.image.load("images/rock.png"), (100, 70)),
-             pygame.transform.scale(pygame.image.load("images/2rock.png"), (170, 70)),
-             pygame.transform.scale(pygame.image.load("images/3rock.png"), (230, 70))]
-BIRDS = [pygame.transform.scale(pygame.image.load("images/bird.png"), (200, 70)),
-         pygame.transform.scale(pygame.image.load("images/bird2.png"), (200, 70))]
-CLOUDS = [pygame.transform.scale(pygame.image.load("images/cloud.png"), (250, 100)),
-          pygame.transform.scale(pygame.image.load("images/cloud2.png"), (250, 100)),
-          pygame.transform.scale(pygame.image.load("images/cloud3.png"), (150, 60)),
-          pygame.transform.scale(pygame.image.load("images/cloud4.png"), (400, 70)),
-          pygame.transform.scale(pygame.image.load("images/cloud5.png"), (150, 60)),
-          pygame.transform.scale(pygame.image.load("images/cloud6.png"), (250, 100))]
+jump_sound = pygame.mixer.Sound('sounds/up.mp3')
+background_sound = pygame.mixer.Sound('sounds/background_sound.mp3')
+RUNNING = [pygame.transform.scale(pygame.image.load("images/person/run1.png"), (200, 250)),
+           pygame.transform.scale(pygame.image.load("images/person/run2.png"), (200, 250))]
+JUMPING = [pygame.transform.scale(pygame.image.load("images/person/person_stand.png"), (200, 250))]
+DUCKING = [pygame.transform.scale(pygame.image.load("images/person/ducking1.png"), (200, 230)), 
+           pygame.transform.scale(pygame.image.load("images/person/ducking2.png"), (200, 230))]
+SMALL_OBSTACLES = [pygame.transform.scale(pygame.image.load("images/obstacles/rock.png"), (100, 70)),
+             pygame.transform.scale(pygame.image.load("images/obstacles/2rock.png"), (170, 70)),
+             pygame.transform.scale(pygame.image.load("images/obstacles/3rock.png"), (230, 70))]
+BIG_OBSTACLES = [pygame.transform.scale(pygame.image.load("images/obstacles/konus1.png"), (100, 150)),
+                 pygame.transform.scale(pygame.image.load("images/obstacles/konus2.png"), (200, 150)),
+                 pygame.transform.scale(pygame.image.load("images/obstacles/konus3.png"), (300, 150))]
+BIRDS = [pygame.transform.scale(pygame.image.load("images/obstacles/bird.png"), (200, 70)),
+         pygame.transform.scale(pygame.image.load("images/obstacles/bird2.png"), (200, 70))]
+CLOUDS = [pygame.transform.scale(pygame.image.load("images/clouds/cloud.png"), (250, 100)),
+          pygame.transform.scale(pygame.image.load("images/clouds/cloud2.png"), (250, 100)),
+          pygame.transform.scale(pygame.image.load("images/clouds/cloud3.png"), (150, 60)),
+          pygame.transform.scale(pygame.image.load("images/clouds/cloud4.png"), (400, 70)),
+          pygame.transform.scale(pygame.image.load("images/clouds/cloud5.png"), (150, 60)),
+          pygame.transform.scale(pygame.image.load("images/clouds/cloud6.png"), (250, 100))]
 
 
 class Person:
@@ -32,6 +38,7 @@ class Person:
     jump_velocity = 8.5
 
     def __init__(self):
+        self.sound_count = 0
         self.duck_img = DUCKING
         self.run_img = RUNNING
         self.jump_img = JUMPING[0]
@@ -39,6 +46,7 @@ class Person:
         self.person_duck = False
         self.person_run = True
         self.person_jump = False
+        self.jump_sound_played = False
 
         self.step_index = 0
         self.jump_vel = self.jump_velocity
@@ -62,6 +70,7 @@ class Person:
             self.person_jump = True
             self.person_duck = False
             self.person_run = False
+            self.jump_sound_played = False
         elif userInput[pygame.K_DOWN] and not self.person_jump:
             self.person_jump = False
             self.person_run = False
@@ -87,6 +96,9 @@ class Person:
         self.step_index += 1
     
     def jump(self):
+        if not self.jump_sound_played:
+            jump_sound.play()
+            self.jump_sound_played = True
         self.image = self.jump_img
         if self.person_jump:
             self.person_rect.y -= self.jump_vel * 5
@@ -141,6 +153,12 @@ class Rocks(Obstacle):
         super().__init__(image, self.type)
         self.rect.y = 700
 
+class Cone(Obstacle):
+    def __init__(self, image):
+        self.type = random.randint(0, 2)
+        super().__init__(image, self.type)
+        self.rect.y = 600
+
 class Bird(Obstacle):
     def __init__(self, image):
         self.type = 0
@@ -159,26 +177,33 @@ class Bird(Obstacle):
 def pavlodar():
     global game_speed, x_pos_bg, y_pos_bg, points, obstacles
     obstacles = []
-    game_speed = 17
+    game_speed = 25
     x_pos_bg = 0
     y_pos_bg = 730
+
+    mouse_x, mouse_y = 0, 0
     points = 0
 
-    background = pygame.transform.scale(pygame.image.load('images/background_pvl_main.png'), (screen_w, screen_h))
-    ground = pygame.transform.scale(pygame.image.load('images/ground.png'), (screen_w, screen_h - 730))
+    background = pygame.transform.scale(pygame.image.load('images/backgrounds/background_pvl_main.png'), (screen_w, screen_h))
+    ground = pygame.transform.scale(pygame.image.load('images/backgrounds/ground.png'), (screen_w, screen_h - 730))
     clock = pygame.time.Clock()
     player = Person()
     cloud = Cloud()
+
+    settings = pygame.transform.scale(pygame.image.load("images/settings.png"), (50, 50))
+    settings_rect = settings.get_rect()
+    settings_rect.topleft = (screen_w - 70, 20)
 
     def score():
         global points, game_speed
         points += 1
         if points % 100 == 0:
             game_speed += 1
+
         font = pygame.font.Font("fonts/PIXY.ttf", 40)
         text = font.render("POINTS: " + str(points), True, (255, 255, 255))
         text_rect = text.get_rect()
-        text_rect.center = (screen_w - 180, 50)
+        text_rect.center = (screen_w - 200, 50)
         screen.blit(text, text_rect)
 
     def Background():
@@ -190,26 +215,32 @@ def pavlodar():
             screen.blit(ground, (image_width + x_pos_bg, y_pos_bg))
             x_pos_bg = 0
         x_pos_bg -= game_speed
-
-
+    #background_sound.play(-1)
     running = True
     while running:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 running = False
                 pygame.quit()
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                mouse_x, mouse_y = event.pos
+        
+
         screen.blit(background, (0,0))
         userInput = pygame.key.get_pressed()
 
         Background()
+        
 
         player.show(screen)
         player.update(userInput)
         
         if not obstacles:
-            if random.randint(0, 1) == 0:
-                obstacles.append(Rocks(OBSTACLES))
-            elif random.randint(0, 1) == 1:
+            if random.randint(0, 2) == 0:
+                obstacles.append(Rocks(SMALL_OBSTACLES))
+            elif random.randint(0, 2) == 1:
+                obstacles.append(Cone(BIG_OBSTACLES))
+            elif random.randint(0, 2) == 2:
                 obstacles.append(Bird(BIRDS))
 
         for obstacle in obstacles:
@@ -223,7 +254,12 @@ def pavlodar():
 
         score()
 
+        screen.blit(settings, settings_rect)
+
+        if settings_rect.collidepoint(mouse_x, mouse_y):
+            screens.pause_pavlodar()
+            
+
         clock.tick(30)
         pygame.display.update()
 
-pavlodar()

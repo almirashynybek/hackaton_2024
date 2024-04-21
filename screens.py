@@ -1,60 +1,99 @@
 import pygame
+import games
+import city_menu
 
-# самый начальный экран, который показывается только раз при запуске кода: на экране только кнопка "START THE GAME!"
+pygame.init()
 
-def menu(menu_flag, screen, button_start_the_game, button_sound, background_sound):
+# основной экран с картой Казахстана
+def map():
+    info = pygame.display.Info()
+    screen_w = info.current_w
+    screen_h = info.current_h
+    screen = pygame.display.set_mode((screen_w, screen_h))
     
-    color = (0, 0, 0)
+    background = pygame.transform.scale(pygame.image.load("images/backgrounds/main_map.png"), screen.get_size())
     mouse_x, mouse_y = 0, 0
-    button_start_the_game = pygame.transform.scale(pygame.image.load(""))
-    button_start_the_game_rect = button_start_the_game.get_rect()
-    button_start_the_game_rect.center = screen.get_rect().center 
+    press_x, press_y = 0, 0
 
+    # инициализируем метки, по которым можно будет переходить на мини-игры
+    pointer = pygame.transform.scale(pygame.image.load("images/cities/red.png"), (80, 90))
+    ala_pointer, pvl_pointer, akx_pointer = pointer, pointer, pointer 
+    ala_pointer_rect, pvl_pointer_rect, akx_pointer_rect = ala_pointer.get_rect(), pvl_pointer.get_rect(), akx_pointer.get_rect()
+    ala_pointer_rect.topleft, pvl_pointer_rect.topleft, akx_pointer_rect.topleft = (1100, 600), (1080, 220), (425, 350)
+   
+    # при наведении мыши на метки появляется название города, инициализируем картинки с названиями
+    almaty = pygame.transform.scale(pygame.image.load("images/cities/almaty.jpg"), (120, 30))
+    aktobe = pygame.transform.scale(pygame.image.load("images/cities/aktobe.jpg"), (120, 30))
+    pavlodar = pygame.transform.scale(pygame.image.load("images/cities/pavlodar.jpg"), (120, 30))
+    almaty_rect, aktobe_rect, pavlodar_rect = almaty.get_rect(), aktobe.get_rect(), pavlodar.get_rect()
+    almaty_rect.topleft = ala_pointer_rect.bottomright 
+    aktobe_rect.topleft = akx_pointer_rect.bottomright 
+    pavlodar_rect.topleft = pvl_pointer_rect.bottomright 
+
+    button_click = pygame.mixer.Sound('sounds/button.mp3')
     running = True
     while running:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 running = False
                 pygame.quit()
-            if event.type == pygame.MOUSEBUTTONDOWN:
+            if event.type == pygame.MOUSEMOTION:
                 mouse_x, mouse_y = event.pos
-        background_sound.play()
-        screen.fill(color)
-        screen.blit(button_start_the_game, button_start_the_game_rect)
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                press_x, press_y = event.pos
+        screen.blit(background, (0,0))
 
-        if button_start_the_game_rect.collidepoint(mouse_x, mouse_y):
-            button_sound.play()
-            menu_flag = False
+        screen.blit(ala_pointer, ala_pointer_rect)
+        screen.blit(pvl_pointer, pvl_pointer_rect)
+        screen.blit(akx_pointer, akx_pointer_rect)
+
+        # если курсор мыши наведен на метку, то показывается название города
+        if ala_pointer_rect.collidepoint(mouse_x, mouse_y):
+            screen.blit(almaty, almaty_rect)
+        elif pvl_pointer_rect.collidepoint(mouse_x, mouse_y):
+            screen.blit(pavlodar, pavlodar_rect)
+        elif akx_pointer_rect.collidepoint(mouse_x, mouse_y):
+            screen.blit(aktobe, aktobe_rect)
+
+        # при нажатии на метку переходим на мини-игру
+        if ala_pointer_rect.collidepoint(press_x, press_y):
+            button_click.play()
+            city_menu.almaty_menu()
+        if pvl_pointer_rect.collidepoint(press_x, press_y):
+            button_click.play()
+            city_menu.pavlodar_menu()
+        if akx_pointer_rect.collidepoint(press_x, press_y):
+            button_click.play()
+            city_menu.aktobe_menu()
+        
+        pygame.display.flip()
+    
 
 
 
+# экран паузы, на экране три кнопки: retry(начать мини-игру заново), continue(продолжить мини-игру), menu(выйти в меню с картой)
 
-# экран паузы, на экране три кнопки: retry(начать мини-игру заново), continue(продолжить мини-игру), map(выйти в меню с картой)
-
-def pause(screen, pause_flag, retry_flag, map_flag, retry_image, continue_image,
-           map_image, button_sound, background_sound):
-
-    screen_width, screen_height = screen.get_size()
-    color = (0, 0, 0)
-    # экспериментально подобрала размеры кнопок...
-    a = screen_height * (7/13)
-    b = screen_width * (18/35)
+def pause_aktobe():
+    info = pygame.display.Info()
+    screen_w = info.current_w
+    screen_h = info.current_h
+    screen = pygame.display.set_mode((screen_w, screen_h))
 
     # приводим все кнопки до одинакого размера
-    retry_image = pygame.transform.scale(retry_image, (a * (2/7), b))
-    continue_image = pygame.transform.scale(continue_image, (a * (2/7), b))
-    map_image = pygame.transform.scale(map_image, (a * (2/7), b))
-
+    retry_image = pygame.transform.scale(pygame.image.load("images/buttons/retry.png"), (800, 200))
+    continue_image = pygame.transform.scale(pygame.image.load("images/buttons/continue.png"), (800, 200))
+    menu_image = pygame.transform.scale(pygame.image.load("images/buttons/menu.png"), (800, 200))
 
     retry_image_rect = retry_image.get_rect()
     continue_image_rect = continue_image.get_rect()
-    map_image_rect = map_image.get_rect()
+    menu_image_rect = menu_image.get_rect()
 
-    continue_image_rect.topleft = (screen_width * (17/70), screen_height * (3/13))
-    retry_image_rect.topleft = (screen_width * (17/70), screen_height * (3/13) + a * (5/14))
-    map_image_rect.topleft = (screen_width * (17/70), screen_height * (3/13) + a * (5/7))
+    continue_image_rect.topleft = (350, 100)
+    retry_image_rect.topleft = (350, 350)
+    menu_image_rect.topleft = (350, 600)
 
     mouse_x, mouse_y = 0, 0
+    button_click = pygame.mixer.Sound('sounds/button.mp3')
 
     running = True
     while running:
@@ -65,45 +104,47 @@ def pause(screen, pause_flag, retry_flag, map_flag, retry_image, continue_image,
             if event.type == pygame.MOUSEBUTTONDOWN:
                 mouse_x, mouse_y = event.pos
             
-        background_sound.play()
-        screen.fill(color)
-        # так же экспериментально подобрала местоположения кнопок...
+        screen.fill("black")
 
+        # так же экспериментально подобрала местоположения кнопок...
         screen.blit(continue_image, continue_image_rect)
         screen.blit(retry_image, retry_image_rect)
-        screen.blit(map_image, map_image_rect)
+        screen.blit(menu_image, menu_image_rect)
         
         if continue_image_rect.collidepoint(mouse_x, mouse_y):
-            button_sound.play()
-            pause_flag = False
+            button_click.play()
         elif retry_image_rect.collidepoint(mouse_x, mouse_y):
-            button_sound.play()
-            pause_flag = False 
-            retry_flag = True
-        elif map_image_rect.collidepoint(mouse_x, mouse_y):
-            button_sound.play()
-            pause_flag = False
-            retry_flag = True
-            map_flag = True
+            button_click.play()
+            games.game_aktobe()
+        elif menu_image_rect.collidepoint(mouse_x, mouse_y):
+            button_click.play()
+            map()
+
+        pygame.display.flip()
 
 
 
+def pause_pavlodar():
+    info = pygame.display.Info()
+    screen_w = info.current_w
+    screen_h = info.current_h
+    screen = pygame.display.set_mode((screen_w, screen_h))
 
-# основной экран с картой Казахстана
+    # приводим все кнопки до одинакого размера
+    retry_image = pygame.transform.scale(pygame.image.load("images/buttons/retry.png"), (800, 200))
+    continue_image = pygame.transform.scale(pygame.image.load("images/buttons/continue.png"), (800, 200))
+    menu_image = pygame.transform.scale(pygame.image.load("images/buttons/menu.png"), (800, 200))
 
-def map(screen, almaty_flag, pavlodar_flag, aktobe_flag, map_flag, map_image,
-        ala_ball_x, ala_ball_y, pvl_ball_x, pvl_ball_y, akx_ball_x, akx_ball_y,
-        ala_bubble_image, pvl_bubble_image, akx_bubble_image,
-        background_sound, sound_of_choice):
-    
-    ball_radius = 8
-    map_image = pygame.transform.scale(map_image, screen.get_size())
+    retry_image_rect = retry_image.get_rect()
+    continue_image_rect = continue_image.get_rect()
+    menu_image_rect = menu_image.get_rect()
+
+    continue_image_rect.topleft = (350, 100)
+    retry_image_rect.topleft = (350, 350)
+    menu_image_rect.topleft = (350, 600)
+
     mouse_x, mouse_y = 0, 0
-    bubble_x, bubble_y = 0, 0
-    bubble_size = (100, 100)
-    ala_bubble = pygame.transform.scale(ala_bubble_image, bubble_size)
-    pvl_bubble = pygame.transform.scale(pvl_bubble_image, bubble_size)
-    akx_bubble = pygame.transform.scale(pvl_bubble_image, bubble_size)
+    button_click = pygame.mixer.Sound('sounds/button.mp3')
 
     running = True
     while running:
@@ -113,53 +154,32 @@ def map(screen, almaty_flag, pavlodar_flag, aktobe_flag, map_flag, map_image,
                 pygame.quit()
             if event.type == pygame.MOUSEBUTTONDOWN:
                 mouse_x, mouse_y = event.pos
-            if event.type == pygame.MOUSEMOTION:
-                bubble_x, bubble_y = event.pos
+            
+        screen.fill("black")
 
-        # устанавливаем на весь экран карту
-        screen.blit(map_image, (0,0))
+        # так же экспериментально подобрала местоположения кнопок...
+        screen.blit(continue_image, continue_image_rect)
+        screen.blit(retry_image, retry_image_rect)
+        screen.blit(menu_image, menu_image_rect)
+        
+        if continue_image_rect.collidepoint(mouse_x, mouse_y):
+            button_click.play()
+        elif retry_image_rect.collidepoint(mouse_x, mouse_y):
+            button_click.play()
+            games.game_pavlodar()
+        elif menu_image_rect.collidepoint(mouse_x, mouse_y):
+            button_click.play()
+            map()
 
-        background_sound.play()
-
-        pygame.draw.circle(screen, "red", (ala_ball_x, ala_ball_y), 8)
-        pygame.draw.circle(screen, "red", (pvl_ball_x, pvl_ball_y), 8)
-        pygame.draw.circle(screen, "red", (akx_ball_x, akx_ball_y), 8)
-
-        ball_size = int(ball_radius * 2 ** 0.5)
-        ala_ball = pygame.Rect(ala_ball_x, ala_ball_y,  ball_size, ball_size)
-        pvl_ball = pygame.Rect(pvl_ball_x, pvl_ball_y,  ball_size, ball_size)
-        akx_ball = pygame.Rect(akx_ball_x, akx_ball_y,  ball_size, ball_size)
-
-
-        if ala_ball.collidepoint(bubble_x, bubble_y):
-            screen.blit(ala_bubble, (ala_ball_x, ala_ball_y))
-        elif pvl_ball.collidepoint(bubble_x, bubble_y):
-            screen.blit(pvl_bubble, (pvl_ball_x, pvl_ball_y))
-        elif akx_ball.collidepoint(bubble_x, bubble_y):
-            screen.blit(akx_bubble, (akx_ball_x, akx_ball_y))
-
-        if ala_ball.collidepoint(mouse_x, mouse_y):
-            sound_of_choice.play()
-            almaty_flag = True
-            pavlodar_flag = False
-            aktobe_flag = False
-            map_flag = False
-        elif pvl_ball.collidepoint(mouse_x, mouse_y):
-            sound_of_choice.play()
-            pavlodar_flag = True
-            almaty_flag = False
-            aktobe_flag = False
-            map_flag = False
-        elif akx_ball.collidepoint(mouse_x, mouse_y):
-            sound_of_choice.play()
-            aktobe_flag = True
-            almaty_flag = False
-            pavlodar_flag = False
-            map_flag = False
+        pygame.display.flip()
 
 
 
 
+    
+
+
+'''
 def recieve(screen, kbtu_part, recieve_flag, map_flag, recive_sound, button_sound, continue_image, count):
     
     kbtu_part = pygame.transform.scale(kbtu_part, (600, 500))
@@ -235,3 +255,5 @@ def victory(screen, kbtu_image, close_image, victory_sound, button_sound):
             button_sound.play()
             running = False
             pygame.quit()
+'''
+
