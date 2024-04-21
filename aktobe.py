@@ -1,9 +1,11 @@
 import pygame
 import time
 import screens
+import screens
 pygame.init()
 
 def aktobe():
+    
     info = pygame.display.Info()
     screen_w = info.current_w
     screen_h = info.current_h
@@ -85,6 +87,20 @@ def aktobe():
         settings_rect = settings.get_rect()
         settings_rect.topleft = (screen_w - 70, 20)
 
+
+        retry_image = pygame.transform.scale(pygame.image.load("images/buttons/retry.png"), (800, 200))
+        continue_image = pygame.transform.scale(pygame.image.load("images/buttons/continue.png"), (800, 200))
+        menu_image = pygame.transform.scale(pygame.image.load("images/buttons/menu.png"), (800, 200))
+
+        retry_image_rect = retry_image.get_rect()
+        continue_image_rect = continue_image.get_rect()
+        menu_image_rect = menu_image.get_rect()
+
+        continue_image_rect.topleft = (350, 100)
+        retry_image_rect.topleft = (350, 350)
+        menu_image_rect.topleft = (350, 600)
+
+
         # определяем на какой ширине будут находиться верхние левые углы прямоугольников пробирок
         tubes_width = []
         for i in range(1, 6):
@@ -142,9 +158,9 @@ def aktobe():
         selected_ball = None
         selected_tube = None
         selected_color = None
-
+        press_x, press_y = 0, 0
         button_click = pygame.mixer.Sound('sounds/button.mp3')
-
+        pause = False
         running = True
         while running:
             for event in pygame.event.get():
@@ -153,71 +169,83 @@ def aktobe():
                     pygame.quit()
                 if event.type == pygame.MOUSEBUTTONDOWN:
                     mouse_x, mouse_y = event.pos
-            
-            screen.blit(background_aktobe, (0,0))
-            
-            # отображаем пробирки с шариками
-            screen.blit(settings, settings_rect)
-            [tubes[i - 1].show(screen, 220*i + 50) for i in range(1, 6)]
-            
-            # перемещение шаров
-            for i, tube in enumerate(tubes):
-                # если нажали на пробирку
-                if tube.rect.collidepoint(mouse_x, mouse_y):
-                    # если до нажатия на пробирку у нас не было шарика, который мы собирались переместить, то теперь есть, при условии, что пробирка не пуста
-                    if selected_tube == None and tube.tube:
-                        selected_tube = tube
-                        selected_ball = tube.tube[-1]
-                        selected_color = tube.colors[-1]
-                        selected_tube.move_up(len(selected_tube.tube) - 1)
-                        ball_up.play()
-                    # если у нас уже был выбранный шарик для перемещения, значит мы нажали на пробирку, в которую хотим перенести этот шарик
-                    elif selected_tube:
-                        # если пробирка не пустая
-                        if tube.tube:
-                            # и либо заполненная, либо цвет последнего в ней шарика не совпадает с нашим, который хотим перенести, то меняет выбранный для перемещения шар
-                            if len(tube.tube) == 4 or tube.colors[-1] != selected_color:
-                                selected_tube.move_down(len(selected_tube.tube) - 1)
-                                ball_down.play()
-                                selected_tube = tube
-                                selected_ball = tube.tube[-1]
-                                selected_color = tube.colors[-1]
-                                selected_tube.move_up(len(selected_tube.tube) - 1)
-                                ball_up.play()
-                            # если все-таки цвета совпадают и пробирка не заполнена, то перемещаем шар
-                            elif tube.colors[-1] == selected_color and len(tube.tube) < 4:
+                    press_x, press_y = event.pos
+            if not pause:
+                screen.blit(background_aktobe, (0,0))
+                
+                # отображаем пробирки с шариками
+                screen.blit(settings, settings_rect)
+                [tubes[i - 1].show(screen, 220*i + 50) for i in range(1, 6)]
+                
+                # перемещение шаров
+                for i, tube in enumerate(tubes):
+                    # если нажали на пробирку
+                    if tube.rect.collidepoint(mouse_x, mouse_y):
+                        # если до нажатия на пробирку у нас не было шарика, который мы собирались переместить, то теперь есть, при условии, что пробирка не пуста
+                        if selected_tube == None and tube.tube:
+                            selected_tube = tube
+                            selected_ball = tube.tube[-1]
+                            selected_color = tube.colors[-1]
+                            selected_tube.move_up(len(selected_tube.tube) - 1)
+                            ball_up.play()
+                        # если у нас уже был выбранный шарик для перемещения, значит мы нажали на пробирку, в которую хотим перенести этот шарик
+                        elif selected_tube:
+                            # если пробирка не пустая
+                            if tube.tube:
+                                # и либо заполненная, либо цвет последнего в ней шарика не совпадает с нашим, который хотим перенести, то меняет выбранный для перемещения шар
+                                if len(tube.tube) == 4 or tube.colors[-1] != selected_color:
+                                    selected_tube.move_down(len(selected_tube.tube) - 1)
+                                    ball_down.play()
+                                    selected_tube = tube
+                                    selected_ball = tube.tube[-1]
+                                    selected_color = tube.colors[-1]
+                                    selected_tube.move_up(len(selected_tube.tube) - 1)
+                                    ball_up.play()
+                                # если все-таки цвета совпадают и пробирка не заполнена, то перемещаем шар
+                                elif tube.colors[-1] == selected_color and len(tube.tube) < 4:
+                                    selected_tube.move_down(len(selected_tube.tube) - 1)
+                                    ball_down.play()
+                                    tube.tube.append(selected_ball)
+                                    tube.colors.append(selected_color)
+                                    if Check_identity(tube.colors):
+                                        full_tube.play(maxtime = 1000)
+                                    selected_tube.tube.pop()
+                                    selected_tube.colors.pop()
+                                    selected_tube = None
+                                    selected_ball = None
+                                    selected_color = None
+                            # если пробирка, в которую мы хотим пернести шар, пуста, то спокойно перемещаем без каких-либо проверок
+                            else:
                                 selected_tube.move_down(len(selected_tube.tube) - 1)
                                 ball_down.play()
                                 tube.tube.append(selected_ball)
                                 tube.colors.append(selected_color)
-                                if Check_identity(tube.colors):
-                                    full_tube.play(maxtime = 1000)
                                 selected_tube.tube.pop()
                                 selected_tube.colors.pop()
                                 selected_tube = None
                                 selected_ball = None
                                 selected_color = None
-                        # если пробирка, в которую мы хотим пернести шар, пуста, то спокойно перемещаем без каких-либо проверок
-                        else:
-                            selected_tube.move_down(len(selected_tube.tube) - 1)
-                            ball_down.play()
-                            tube.tube.append(selected_ball)
-                            tube.colors.append(selected_color)
-                            selected_tube.tube.pop()
-                            selected_tube.colors.pop()
-                            selected_tube = None
-                            selected_ball = None
-                            selected_color = None
-                    
-                    mouse_x, mouse_y = 0, 0
+                        
+                        mouse_x, mouse_y = 0, 0
 
-            if settings_rect.collidepoint(mouse_x, mouse_y):
-                button_click.play()
-                screens.pause_aktobe()
+                if settings_rect.collidepoint(mouse_x, mouse_y):
+                    button_click.play()
+                    pause = True
+
+            else:
+                screen.fill("black")
+                screen.blit(continue_image, continue_image_rect)
+                screen.blit(retry_image, retry_image_rect)
+                screen.blit(menu_image, menu_image_rect)
+            
+                if continue_image_rect.collidepoint(press_x, press_y):
+                    button_click.play()
+                    pause = False
+                elif retry_image_rect.collidepoint(press_x, press_y):
+                    button_click.play()
+                    aktobe()
+                elif menu_image_rect.collidepoint(press_x, press_y):
+                    button_click.play()
+                    screens.map()
             pygame.display.flip()
     game(screen)
-
-
-
-
-

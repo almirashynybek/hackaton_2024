@@ -215,7 +215,23 @@ def pavlodar():
             screen.blit(ground, (image_width + x_pos_bg, y_pos_bg))
             x_pos_bg = 0
         x_pos_bg -= game_speed
+
+
+    retry_image = pygame.transform.scale(pygame.image.load("images/buttons/retry.png"), (800, 200))
+    continue_image = pygame.transform.scale(pygame.image.load("images/buttons/continue.png"), (800, 200))
+    menu_image = pygame.transform.scale(pygame.image.load("images/buttons/menu.png"), (800, 200))
+
+    retry_image_rect = retry_image.get_rect()
+    continue_image_rect = continue_image.get_rect()
+    menu_image_rect = menu_image.get_rect()
+
+    continue_image_rect.topleft = (350, 100)
+    retry_image_rect.topleft = (350, 350)
+    menu_image_rect.topleft = (350, 600)
+
+    button_click = pygame.mixer.Sound('sounds/button.mp3')
     #background_sound.play(-1)
+    pause = False
     running = True
     while running:
         for event in pygame.event.get():
@@ -225,41 +241,59 @@ def pavlodar():
             if event.type == pygame.MOUSEBUTTONDOWN:
                 mouse_x, mouse_y = event.pos
         
+        if not pause:
+            screen.blit(background, (0,0))
+            userInput = pygame.key.get_pressed()
 
-        screen.blit(background, (0,0))
-        userInput = pygame.key.get_pressed()
-
-        Background()
-        
-
-        player.show(screen)
-        player.update(userInput)
-        
-        if not obstacles:
-            if random.randint(0, 2) == 0:
-                obstacles.append(Rocks(SMALL_OBSTACLES))
-            elif random.randint(0, 2) == 1:
-                obstacles.append(Cone(BIG_OBSTACLES))
-            elif random.randint(0, 2) == 2:
-                obstacles.append(Bird(BIRDS))
-
-        for obstacle in obstacles:
-            obstacle.show(screen)
-            obstacle.update()
-            if player.person_rect.colliderect(obstacle.rect) and not player.person_jump:
-                pygame.quit()
-
-        cloud.show(screen)
-        cloud.update()
-
-        score()
-
-        screen.blit(settings, settings_rect)
-
-        if settings_rect.collidepoint(mouse_x, mouse_y):
-            screens.pause_pavlodar()
+            Background()
             
 
-        clock.tick(30)
+            player.show(screen)
+            player.update(userInput)
+            
+            if not obstacles:
+                if random.randint(0, 2) == 0:
+                    obstacles.append(Rocks(SMALL_OBSTACLES))
+                elif random.randint(0, 2) == 1:
+                    obstacles.append(Cone(BIG_OBSTACLES))
+                elif random.randint(0, 2) == 2:
+                    obstacles.append(Bird(BIRDS))
+
+            for obstacle in obstacles:
+                obstacle.show(screen)
+                obstacle.update()
+                if player.person_rect.colliderect(obstacle.rect) and not player.person_jump:
+                    pygame.quit()
+
+            cloud.show(screen)
+            cloud.update()
+
+            score()
+
+            screen.blit(settings, settings_rect)
+
+            if settings_rect.collidepoint(mouse_x, mouse_y):
+                button_click.play()
+                pause = True
+                
+
+            clock.tick(30)
+        else:
+            screen.fill("black")
+
+            # так же экспериментально подобрала местоположения кнопок...
+            screen.blit(continue_image, continue_image_rect)
+            screen.blit(retry_image, retry_image_rect)
+            screen.blit(menu_image, menu_image_rect)
+            
+            if continue_image_rect.collidepoint(mouse_x, mouse_y):
+                button_click.play()
+                pause = False
+            elif retry_image_rect.collidepoint(mouse_x, mouse_y):
+                button_click.play()
+                pavlodar()
+            elif menu_image_rect.collidepoint(mouse_x, mouse_y):
+                button_click.play()
+                screens.map()
         pygame.display.update()
 
