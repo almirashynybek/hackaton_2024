@@ -1,5 +1,7 @@
 import pygame
 import menus
+
+
 pygame.init()
 
 # устанавливаем экран
@@ -17,6 +19,7 @@ button_start_the_game = pygame.transform.scale(pygame.image.load("images/buttons
 button_start_the_game_rect = button_start_the_game.get_rect()
 button_start_the_game_rect.center = screen.get_rect(). center
 button_click = pygame.mixer.Sound('sounds/button.mp3')
+
 
 # для установки координат нажатия мыши
 press_x, press_y = 0, 0
@@ -40,5 +43,8 @@ while running:
     if button_start_the_game_rect.collidepoint(press_x, press_y):
         button_click.play()
         menus.menu()
+    
+
+
 
     pygame.display.flip()

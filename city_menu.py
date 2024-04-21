@@ -1,5 +1,5 @@
 import pygame
-#import almaty
+import almaty
 import aktobe
 import pavlodar
 pygame.init()
@@ -29,12 +29,11 @@ def almaty_menu():
                 press_x, press_y = event.pos
         screen.blit(background, (0, 0))
         screen.blit(button_start, button_start_rect)
-        ''''
+        
         # при нажатии кнопки "START" начинается игра
         if button_start_rect.collidepoint(press_x, press_y):
             button_click.play()
             almaty.almaty()
-        '''
 
         pygame.display.flip()
 

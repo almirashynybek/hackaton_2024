@@ -2,7 +2,10 @@ import pygame
 import time
 import screens
 import screens
+import flags
 pygame.init()
+
+
 
 def aktobe():
     
@@ -14,6 +17,9 @@ def aktobe():
     # move_h - высота, на которую будут подниматься шарики при нажатии на пробирку
     move_h = screen.get_height() // 2 - 295
 
+    
+
+
     # проверка на 4 одинаковых шарика в пробирке
     def Check_identity(color_list):
         for i in range(len(color_list) - 1):
@@ -21,6 +27,15 @@ def aktobe():
                 return False
         if len(color_list) == 4:
             return True
+        
+    def Check(colors):
+        count = 0
+        for list in colors:
+            if Check_identity(list):
+                count += 1
+        if count == 3:
+            return True
+        return False
 
     # класс для красных шариков для автоматического определения изображения и его прямоугольника
     class RedBall(pygame.sprite.Sprite):
@@ -100,7 +115,7 @@ def aktobe():
         retry_image_rect.topleft = (350, 350)
         menu_image_rect.topleft = (350, 600)
 
-
+        
         # определяем на какой ширине будут находиться верхние левые углы прямоугольников пробирок
         tubes_width = []
         for i in range(1, 6):
@@ -149,6 +164,7 @@ def aktobe():
         
 
         tubes = [tube1, tube2, tube3, tube4, tube5]
+        #colors = [tube1_colors, tube2_colors, tube3_colors, tube4_colors, tube5_colors]
 
         full_tube = pygame.mixer.Sound('sounds/full_tube.mp3')
         ball_down = pygame.mixer.Sound('sounds/up.mp3')
@@ -176,9 +192,10 @@ def aktobe():
                 # отображаем пробирки с шариками
                 screen.blit(settings, settings_rect)
                 [tubes[i - 1].show(screen, 220*i + 50) for i in range(1, 6)]
-                
+                colors = []
                 # перемещение шаров
                 for i, tube in enumerate(tubes):
+                    
                     # если нажали на пробирку
                     if tube.rect.collidepoint(mouse_x, mouse_y):
                         # если до нажатия на пробирку у нас не было шарика, который мы собирались переместить, то теперь есть, при условии, что пробирка не пуста
@@ -227,7 +244,12 @@ def aktobe():
                                 selected_color = None
                         
                         mouse_x, mouse_y = 0, 0
-
+                    colors.append(tube.colors)
+                
+                if Check(colors):
+                    time.sleep(0.5)
+                    flags.victory2 = True
+                    screens.win1()
                 if settings_rect.collidepoint(mouse_x, mouse_y):
                     button_click.play()
                     pause = True
@@ -247,5 +269,6 @@ def aktobe():
                 elif menu_image_rect.collidepoint(press_x, press_y):
                     button_click.play()
                     screens.map()
+            
             pygame.display.flip()
     game(screen)

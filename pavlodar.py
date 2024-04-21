@@ -1,7 +1,9 @@
 import pygame
 import os
+import time
 import random
 import screens
+import flags
 pygame.init()
 
 info = pygame.display.Info()
@@ -172,7 +174,8 @@ class Bird(Obstacle):
         screen.blit(self.image[self.index // 5], self.rect)
         self.index += 1
 
-
+global victory3
+victory3 = False
 
 def pavlodar():
     global game_speed, x_pos_bg, y_pos_bg, points, obstacles
@@ -180,9 +183,11 @@ def pavlodar():
     game_speed = 25
     x_pos_bg = 0
     y_pos_bg = 730
-
+   
     mouse_x, mouse_y = 0, 0
     points = 0
+    global victory3
+    victory3 = False
 
     background = pygame.transform.scale(pygame.image.load('images/backgrounds/background_pvl_main.png'), (screen_w, screen_h))
     ground = pygame.transform.scale(pygame.image.load('images/backgrounds/ground.png'), (screen_w, screen_h - 730))
@@ -263,19 +268,23 @@ def pavlodar():
                 obstacle.show(screen)
                 obstacle.update()
                 if player.person_rect.colliderect(obstacle.rect) and not player.person_jump:
-                    pygame.quit()
+                    pavlodar()
 
             cloud.show(screen)
             cloud.update()
 
             score()
-
+            
             screen.blit(settings, settings_rect)
 
             if settings_rect.collidepoint(mouse_x, mouse_y):
                 button_click.play()
                 pause = True
                 
+            if points == 1500:
+                time.sleep(0.5)
+                flags.victory3 = True
+                screens.win2()
 
             clock.tick(30)
         else:
