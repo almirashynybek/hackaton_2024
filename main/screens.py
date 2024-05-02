@@ -14,8 +14,8 @@ def map():
     info = pygame.display.Info()
     screen_w = 1536
     screen_h = 864
-    print(screen_w, screen_h)
     screen = pygame.display.set_mode((screen_w, screen_h))
+    
     
     background = pygame.transform.scale(pygame.image.load("images/backgrounds/main_map.png"), screen.get_size())
     mouse_x, mouse_y = 0, 0
@@ -28,11 +28,11 @@ def map():
     ala_pointer_rect.topleft, pvl_pointer_rect.topleft, akx_pointer_rect.topleft = (1100, 600), (1080, 220), (425, 350)
    
     # при наведении мыши на метки появляется название города, инициализируем картинки с названиями
-    almaty = pygame.transform.scale(pygame.image.load("images/cities/almaty.jpg"), (120, 30))
-    aktobe = pygame.transform.scale(pygame.image.load("images/cities/aktobe.jpg"), (120, 30))
-    pavlodar = pygame.transform.scale(pygame.image.load("images/cities/pavlodar.jpg"), (120, 30))
+    almaty = pygame.transform.scale(pygame.image.load("images/cities/almaty.png"), (110, 25))
+    aktobe = pygame.transform.scale(pygame.image.load("images/cities/aktobe.png"), (110, 25))
+    pavlodar = pygame.transform.scale(pygame.image.load("images/cities/pavlodar.png"), (110, 25))
     almaty_rect, aktobe_rect, pavlodar_rect = almaty.get_rect(), aktobe.get_rect(), pavlodar.get_rect()
-    almaty_rect.topleft = ala_pointer_rect.bottomright 
+    almaty_rect.topleft = ala_pointer_rect.bottomright
     aktobe_rect.topleft = akx_pointer_rect.bottomright 
     pavlodar_rect.topleft = pvl_pointer_rect.bottomright
 
@@ -94,6 +94,7 @@ def win1():
     screen_h = info.current_h
     screen = pygame.display.set_mode((screen_w, screen_h))
 
+    background_button = pygame.transform.scale(pygame.image.load("images/backgrounds/background_buttons.jpg"), (screen_w, screen_h))
     part1 = pygame.image.load('images/KBTU/part1_done.png')
     part1_rect = part1.get_rect()
     part1_rect.center = screen.get_rect().center
@@ -114,7 +115,7 @@ def win1():
             if event.type == pygame.MOUSEBUTTONDOWN:
                 press_x, press_y = event.pos
             
-        screen.fill("black")
+        screen.blit(background_button, (0,0))
         screen.blit(part1, part1_rect)
         screen.blit(close_button, close_button_rect)
     
@@ -129,6 +130,7 @@ def win2():
     screen_h = info.current_h
     screen = pygame.display.set_mode((screen_w, screen_h))
 
+    background_button = pygame.transform.scale(pygame.image.load("images/backgrounds/background_buttons.jpg"), (screen_w, screen_h))
     part1 = pygame.image.load('images/KBTU/part2_done.png')
     part1_rect = part1.get_rect()
     part1_rect.center = screen.get_rect().center
@@ -149,7 +151,7 @@ def win2():
             if event.type == pygame.MOUSEBUTTONDOWN:
                 press_x, press_y = event.pos
             
-        screen.fill("black")
+        screen.blit(background_button, (0,0))
         screen.blit(part1, part1_rect)
         screen.blit(close_button, close_button_rect)
     
@@ -164,6 +166,7 @@ def win3():
     screen_h = 864
     screen = pygame.display.set_mode((screen_w, screen_h))
 
+    background_button = pygame.transform.scale(pygame.image.load("images/backgrounds/background_buttons.jpg"), (screen_w, screen_h))
     part1 = pygame.image.load('images/KBTU/part3_done.png')
     part1_rect = part1.get_rect()
     part1_rect.center = screen.get_rect().center
@@ -184,7 +187,7 @@ def win3():
             if event.type == pygame.MOUSEBUTTONDOWN:
                 press_x, press_y = event.pos
             
-        screen.fill("black")
+        screen.blit(background_button, (0,0))
         screen.blit(part1, part1_rect)
         screen.blit(close_button, close_button_rect)
     
@@ -208,6 +211,9 @@ def victory():
     button_click = pygame.mixer.Sound('sounds/button.mp3')
     mouse_x, mouse_y = 0, 0
 
+    sound = pygame.mixer.Sound('sounds/victory_sound.mp3')
+    sound.play()
+    background_button = pygame.transform.scale(pygame.image.load("images/backgrounds/background_buttons.jpg"), (screen_w, screen_h))
     font = pygame.font.Font("fonts/Silkscreen.ttf", 60)
     text = font.render("CONGRATULATIONS!!!", True, (255, 255, 255))
     text_rect = text.get_rect()
@@ -222,7 +228,7 @@ def victory():
             if event.type == pygame.MOUSEBUTTONDOWN:
                 mouse_x, mouse_y = event.pos
         
-        screen.fill("black")
+        screen.blit(background_button, (0,0))
         screen.blit(kbtu_image, kbtu_image_rect)
         screen.blit(text, text_rect)
         screen.blit(close_button, close_button_rect)

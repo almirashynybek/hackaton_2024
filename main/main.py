@@ -15,7 +15,7 @@ background_sound = pygame.mixer.Sound('sounds/background_sound.mp3')
 background_sound.play(-1)
 
 # устанавливаем кнопку, которая начнет игру. устанавливаем звук, который будет проигрываться после нажатия кнопки
-button_start_the_game = pygame.transform.scale(pygame.image.load("images/buttons/start_the_game.png"), (800, 300))
+button_start_the_game = pygame.transform.scale(pygame.image.load("images/buttons/start_the_game.png"), (800, 250))
 button_start_the_game_rect = button_start_the_game.get_rect()
 button_start_the_game_rect.center = screen.get_rect(). center
 button_click = pygame.mixer.Sound('sounds/button.mp3')
@@ -23,6 +23,8 @@ button_click = pygame.mixer.Sound('sounds/button.mp3')
 
 # для установки координат нажатия мыши
 press_x, press_y = 0, 0
+
+background_button = pygame.transform.scale(pygame.image.load("images/backgrounds/background_buttons.jpg"), (screen_w, screen_h))
 
 # основной цикл игры
 running = True
@@ -36,7 +38,7 @@ while running:
         if event.type == pygame.MOUSEBUTTONDOWN:
             press_x, press_y = event.pos
     # устанавливаем кнопку "START THE GAME!" на черном фоне
-    screen.fill("black")
+    screen.blit(background_button, (0,0))
     screen.blit(button_start_the_game, button_start_the_game_rect)    
         
     # если нажали на кнопку, то игра начинается

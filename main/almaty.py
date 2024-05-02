@@ -10,30 +10,37 @@ pygame.init()
 
 def almaty():
     
+    info = pygame.display.Info()
+    back_w = info.current_w
+    back_h = info.current_h
+
     SCREEN_WIDTH = 600
     SCREEN_HEIGHT = 800
 
-    retry_image = pygame.transform.scale(pygame.image.load("images/buttons/retry.png"), (250, 100))
-    continue_image = pygame.transform.scale(pygame.image.load("images/buttons/continue.png"), (250, 100))
-    menu_image = pygame.transform.scale(pygame.image.load("images/buttons/menu.png"), (250, 100))
+    retry_image = pygame.transform.scale(pygame.image.load("images/buttons/retry.png"), (500, 120))
+    continue_image = pygame.transform.scale(pygame.image.load("images/buttons/close.png"), (500, 120))
+    menu_image = pygame.transform.scale(pygame.image.load("images/buttons/menu.png"), (500, 120))
 
     retry_image_rect = retry_image.get_rect()
     continue_image_rect = continue_image.get_rect()
     menu_image_rect = menu_image.get_rect()
-    
-    continue_image_rect.topleft = (200, 100)
-    retry_image_rect.topleft = (200, 350)
-    menu_image_rect.topleft = (200, 600)
 
-    screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
+    continue_image_rect.topleft = (back_w//2 - 250, 150)
+    retry_image_rect.topleft = (back_w//2 - 250, 350)
+    menu_image_rect.topleft = (back_w//2 - 250, 550)
 
+    background_button = pygame.transform.scale(pygame.image.load("images/backgrounds/background_buttons.jpg"), (back_w, back_h))
+
+    back = pygame.display.set_mode((back_w, back_h))
+    screen = pygame.Surface((SCREEN_WIDTH, back_w))
+    back.fill("black")
     background = pygame.image.load("images/background_main.png").convert()
-    background_y = SCREEN_HEIGHT - background.get_height()
+    background_y = back_h - background.get_height()
 
     BLACK = (0, 0, 0)
 
     clock = pygame.time.Clock()
-
+    speed_1 = 9
     background_speed = 0
     player_change_time = 100 
     player2_change_time = 100 
@@ -61,15 +68,16 @@ def almaty():
     class Enemy(pygame.sprite.Sprite):
         def __init__(self):
             super().__init__()
-            self.image = pygame.image.load('images/snowball.png')
+            self.image = pygame.image.load('images/obstacles/rock_alm.png')
             self.rect = self.image.get_rect()
             self.rect.center = (random.randint(40, SCREEN_WIDTH - 40), random.randint(0, SCREEN_HEIGHT - 800))
-            self.speed = 9
+            self.speed = speed_1
 
         def move(self):
             self.rect.move_ip(0, self.speed)
             if (self.rect.top > SCREEN_HEIGHT):
                 self.rect.top = 0
+                self.speed += 0.5
                 self.rect.center = (random.randint(40, SCREEN_WIDTH - 40), 0)
 
     class Standing(pygame.sprite.Sprite):
@@ -94,7 +102,7 @@ def almaty():
             super().__init__()
             self.image = pygame.transform.scale(pygame.image.load('images/KBTU/part3.png'), (200,100))
             self.rect = self.image.get_rect()
-            self.rect.centerx = SCREEN_WIDTH // 2
+            self.rect.centerx = SCREEN_WIDTH // 2 - 25
             self.rect.top = 0
             
 
@@ -152,7 +160,7 @@ def almaty():
     pause = False
     settings = pygame.transform.scale(pygame.image.load("images/settings.png"), (50, 50))
     settings_rect = settings.get_rect()
-    settings_rect.topleft = (screen.get_rect().width - 70, 20)
+    settings_rect.topleft = (back.get_rect().width - 70, 20)
     button_click = pygame.mixer.Sound('sounds/button.mp3')
     while True:
         for event in pygame.event.get():
@@ -163,7 +171,7 @@ def almaty():
                 press_x, press_y = event.pos
                 
         if not pause:
-            
+            back.blit(screen, (back_w//2 - SCREEN_WIDTH//2, 0))
             pressed_key = pygame.key.get_pressed()
             if pressed_key[K_UP]:
                 background_speed = 3
@@ -214,6 +222,7 @@ def almaty():
                 for entity in player_end:
                     entity.update()
                     screen.blit(entity.image, entity.rect)
+                    
                 time.sleep(0.5)
                 flags.victory1 = True
                 screens.win3()
@@ -222,17 +231,18 @@ def almaty():
                 pygame.mixer.Sound('images/sound.mp3').play()
                 time.sleep(0.5)
                 almaty()
-            screen.blit(settings, settings_rect)
+            back.blit(settings, settings_rect)
             if settings_rect.collidepoint(press_x, press_y):
                 pause = True
         else:
-            screen.fill("black")
-            screen.blit(continue_image, continue_image_rect)
-            screen.blit(retry_image, retry_image_rect)
-            screen.blit(menu_image, menu_image_rect)
+            back.blit(background_button, (0,0))
+            back.blit(continue_image, continue_image_rect)
+            back.blit(retry_image, retry_image_rect)
+            back.blit(menu_image, menu_image_rect)
             
             if continue_image_rect.collidepoint(press_x, press_y):
                 button_click.play()
+                back.fill("black")
                 pause = False
             elif retry_image_rect.collidepoint(press_x, press_y):
                 button_click.play() 

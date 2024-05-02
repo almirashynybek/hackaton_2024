@@ -103,17 +103,17 @@ def aktobe():
         settings_rect.topleft = (screen_w - 70, 20)
 
 
-        retry_image = pygame.transform.scale(pygame.image.load("images/buttons/retry.png"), (800, 200))
-        continue_image = pygame.transform.scale(pygame.image.load("images/buttons/continue.png"), (800, 200))
-        menu_image = pygame.transform.scale(pygame.image.load("images/buttons/menu.png"), (800, 200))
+        retry_image = pygame.transform.scale(pygame.image.load("images/buttons/retry.png"), (500, 120))
+        continue_image = pygame.transform.scale(pygame.image.load("images/buttons/close.png"), (500, 120))
+        menu_image = pygame.transform.scale(pygame.image.load("images/buttons/menu.png"), (500, 120))
 
         retry_image_rect = retry_image.get_rect()
         continue_image_rect = continue_image.get_rect()
         menu_image_rect = menu_image.get_rect()
 
-        continue_image_rect.topleft = (350, 100)
-        retry_image_rect.topleft = (350, 350)
-        menu_image_rect.topleft = (350, 600)
+        continue_image_rect.topleft = (screen_w//2 - 250, 150)
+        retry_image_rect.topleft = (screen_w//2 - 250, 350)
+        menu_image_rect.topleft = (screen_w//2 - 250, 550)
 
         
         # определяем на какой ширине будут находиться верхние левые углы прямоугольников пробирок
@@ -170,6 +170,7 @@ def aktobe():
         ball_down = pygame.mixer.Sound('sounds/up.mp3')
         ball_up = pygame.mixer.Sound('sounds/down.mp3')
 
+        background_button = pygame.transform.scale(pygame.image.load("images/backgrounds/background_buttons.jpg"), (screen_w, screen_h))
         # выбранные пробирка, шарик и цвет - это конкретного цвет конкретный шарик из конкретной пробирки, который мы собираемся перемещать
         selected_ball = None
         selected_tube = None
@@ -255,7 +256,7 @@ def aktobe():
                     pause = True
 
             else:
-                screen.fill("black")
+                screen.blit(background_button, (0,0))
                 screen.blit(continue_image, continue_image_rect)
                 screen.blit(retry_image, retry_image_rect)
                 screen.blit(menu_image, menu_image_rect)

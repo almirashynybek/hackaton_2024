@@ -9,7 +9,7 @@ def menu():
     screen_h = info.current_h
     screen = pygame.display.set_mode((screen_w, screen_h))
 
-    background = pygame.transform.scale(pygame.image.load("images/texts/1.png"), (screen_w, screen_h))
+    background = pygame.transform.scale(pygame.image.load("images/texts/1.jpg"), (screen_w, screen_h))
     press_x, press_y = 0, 0
 
     button_OK = pygame.transform.scale(pygame.image.load("images/buttons/OK.png"), (180, 70))

@@ -10,7 +10,7 @@ def almaty_menu():
     screen_w = info.current_w
     screen_h = info.current_h
     screen = pygame.display.set_mode((screen_w, screen_h))
-    background = pygame.transform.scale(pygame.image.load("images/texts/3.png"), (screen_w, screen_h))
+    background = pygame.transform.scale(pygame.image.load("images/texts/3.jpg"), (screen_w, screen_h))
 
     button_start = pygame.transform.scale(pygame.image.load("images/buttons/start.png"), (180, 70))
     button_start_rect = button_start.get_rect()
@@ -45,7 +45,7 @@ def aktobe_menu():
     screen_h = info.current_h
     screen = pygame.display.set_mode((screen_w, screen_h))
 
-    background = pygame.transform.scale(pygame.image.load("images/texts/2.png"), (screen_w, screen_h))
+    background = pygame.transform.scale(pygame.image.load("images/texts/2.jpg"), (screen_w, screen_h))
 
     button_start = pygame.transform.scale(pygame.image.load("images/buttons/OK.png"), (180, 70))
     button_start_rect = button_start.get_rect()
@@ -78,7 +78,7 @@ def pavlodar_menu():
     screen_h = info.current_h
     screen = pygame.display.set_mode((screen_w, screen_h))
 
-    background = pygame.transform.scale(pygame.image.load("images/texts/4.png"), (screen_w, screen_h))
+    background = pygame.transform.scale(pygame.image.load("images/texts/4.jpg"), (screen_w, screen_h))
 
     press_x, press_y = 0, 0 
 

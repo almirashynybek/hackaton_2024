@@ -189,6 +189,7 @@ def pavlodar():
     global victory3
     victory3 = False
 
+    background_button = pygame.transform.scale(pygame.image.load("images/backgrounds/background_buttons.jpg"), (screen_w, screen_h))
     background = pygame.transform.scale(pygame.image.load('images/backgrounds/background_pvl_main.png'), (screen_w, screen_h))
     ground = pygame.transform.scale(pygame.image.load('images/backgrounds/ground.png'), (screen_w, screen_h - 730))
     clock = pygame.time.Clock()
@@ -203,7 +204,7 @@ def pavlodar():
         global points, game_speed
         points += 1
         if points % 100 == 0:
-            game_speed += 1
+            game_speed += 2
 
         font = pygame.font.Font("fonts/PIXY.ttf", 40)
         text = font.render("POINTS: " + str(points), True, (255, 255, 255))
@@ -222,17 +223,17 @@ def pavlodar():
         x_pos_bg -= game_speed
 
 
-    retry_image = pygame.transform.scale(pygame.image.load("images/buttons/retry.png"), (800, 200))
-    continue_image = pygame.transform.scale(pygame.image.load("images/buttons/continue.png"), (800, 200))
-    menu_image = pygame.transform.scale(pygame.image.load("images/buttons/menu.png"), (800, 200))
+    retry_image = pygame.transform.scale(pygame.image.load("images/buttons/retry.png"), (500, 120))
+    continue_image = pygame.transform.scale(pygame.image.load("images/buttons/close.png"), (500, 120))
+    menu_image = pygame.transform.scale(pygame.image.load("images/buttons/menu.png"), (500, 120))
 
     retry_image_rect = retry_image.get_rect()
     continue_image_rect = continue_image.get_rect()
     menu_image_rect = menu_image.get_rect()
 
-    continue_image_rect.topleft = (350, 100)
-    retry_image_rect.topleft = (350, 350)
-    menu_image_rect.topleft = (350, 600)
+    continue_image_rect.topleft = (screen_w//2 - 250, 150)
+    retry_image_rect.topleft = (screen_w//2 - 250, 350)
+    menu_image_rect.topleft = (screen_w//2 - 250, 550)
 
     button_click = pygame.mixer.Sound('sounds/button.mp3')
     #background_sound.play(-1)
@@ -281,14 +282,14 @@ def pavlodar():
                 button_click.play()
                 pause = True
                 
-            if points == 2000:
+            if points == 1500:
                 time.sleep(0.5)
                 flags.victory3 = True
                 screens.win2()
 
             clock.tick(30)
         else:
-            screen.fill("black")
+            screen.blit(background_button, (0,0))
 
             # так же экспериментально подобрала местоположения кнопок...
             screen.blit(continue_image, continue_image_rect)
